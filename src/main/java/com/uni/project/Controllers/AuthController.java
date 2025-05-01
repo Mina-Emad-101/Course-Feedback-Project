@@ -9,9 +9,12 @@ import com.uni.project.Models.Dtos.UserWithRoleDTO;
 import com.uni.project.Repositories.RoleRepository;
 import com.uni.project.Repositories.UserRepository;
 import com.uni.project.Requests.LoginRequest;
+import com.uni.project.Requests.RegisterRequest;
 import com.uni.project.Responses.LoginResponse;
 import com.uni.project.Services.HashService;
 import com.uni.project.Services.JWTService;
+
+import jakarta.validation.Valid;
 
 import java.lang.module.ResolvedModule;
 import java.security.NoSuchAlgorithmException;
@@ -46,20 +49,21 @@ public class AuthController {
 	JWTService jwtService;
 
 	@PostMapping("/register")
-	public ResponseEntity<Object> register(@RequestBody User user) throws NoSuchAlgorithmException {
-		if (!(user.getName() != null && user.getEmail() != null && user.getPassword() != null)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Invalid Request Body"));
-		}
+	public ResponseEntity<Object> register(@RequestBody @Valid RegisterRequest registerRequest)
+			throws NoSuchAlgorithmException {
+		User user = User.builder()
+				.name(registerRequest.getName())
+				.email(registerRequest.getEmail())
+				.password(hashService.hashString(registerRequest.getPassword()))
+				.role(this.roleRepository.findById(Role.getStudentRoleID()).orElseThrow())
+				.build();
 
-		user.setPassword(hashService.hashString(user.getPassword()));
-
-		user.setRole(this.roleRepository.findById(Role.getStudentRoleID()).orElseThrow());
 		User newUser = this.userRepository.save(user);
 		return ResponseEntity.ok(new UserWithRoleDTO(newUser));
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) throws NoSuchAlgorithmException {
+	public ResponseEntity<Object> login(@RequestBody @Valid LoginRequest loginRequest) throws NoSuchAlgorithmException {
 		String email = loginRequest.getEmail();
 		String password = loginRequest.getPassword();
 

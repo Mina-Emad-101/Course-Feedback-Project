@@ -47,7 +47,7 @@ public class AuthAspect {
 		String token = this.request.getHeader("Authorization");
 		if (token == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(new ErrorResponse("User Must be Authorized for this action"));
+					.body(new ErrorResponse("User Must be Authenticated for this action"));
 		}
 		token = token.replace("Bearer ", "");
 
