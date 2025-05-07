@@ -56,6 +56,18 @@ public class User {
 		User.loggedInUser = Optional.empty();
 	}
 
+	public Boolean isAdmin() {
+		return this.role.getId() == Role.getAdminRoleID();
+	}
+
+	public Boolean isStudent() {
+		return this.role.getId() == Role.getStudentRoleID();
+	}
+
+	public Boolean isInstructor() {
+		return this.role.getId() == Role.getInstructorRoleID();
+	}
+
 	@Override
 	public String toString() {
 		return "{ id: " + this.id + ", email: " + this.email + ", role: " + this.role.getName() + " }";

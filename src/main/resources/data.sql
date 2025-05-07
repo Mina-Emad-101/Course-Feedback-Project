@@ -6,6 +6,6 @@ VALUES
 
 INSERT INTO users (name, email, password, role_id)
 VALUES
-    ('Admin', 'admin@gmail.com', '$2y$12$sVi5nffI3a/dgdY7ICq.re5kOG80ovoSE9LVnM0z9rPQXaFJDH53e', 1),
-    ('Instructor', 'instructor@gmail.com', '$2y$12$sVi5nffI3a/dgdY7ICq.re5kOG80ovoSE9LVnM0z9rPQXaFJDH53e', 2),
-    ('Student', 'student@gmail.com', '$2y$12$sVi5nffI3a/dgdY7ICq.re5kOG80ovoSE9LVnM0z9rPQXaFJDH53e', 3);
+    ('Admin', 'admin@gmail.com', "^�H��(qQ��o��)'s`=j���*�rB�", 1),
+    ('Instructor', 'instructor@gmail.com', "^�H��(qQ��o��)'s`=j���*�rB�", 2),
+    ('Student', 'student@gmail.com', "^�H��(qQ��o��)'s`=j���*�rB�", 3);

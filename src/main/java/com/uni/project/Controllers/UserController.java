@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.project.Annotations.AuthGuarded;
+import com.uni.project.Annotations.AdminsOnly;
 import com.uni.project.Models.Role;
 import com.uni.project.Models.User;
 import com.uni.project.Models.Dtos.ModelDTO;
@@ -47,6 +48,7 @@ public class UserController {
 
 	@GetMapping("/users")
 	@AuthGuarded
+	@AdminsOnly
 	public ResponseEntity<Object> getUsers() {
 		Iterable<User> users = this.userRepository.findAll();
 		List<ModelDTO> usersDTO = new ArrayList<ModelDTO>();
@@ -59,6 +61,7 @@ public class UserController {
 
 	@GetMapping("/users/{id}")
 	@AuthGuarded
+	@AdminsOnly
 	public ResponseEntity<Object> getUser(@PathVariable Long id) {
 		Optional<User> user = this.userRepository.findById(id);
 
@@ -71,6 +74,7 @@ public class UserController {
 
 	@PostMapping("/users")
 	@AuthGuarded
+	@AdminsOnly
 	public ResponseEntity<Object> createUser(@RequestBody @Valid CreateUserRequest userRequest) throws NoSuchAlgorithmException {
 		String password = userRequest.getPassword();
 		String hashedPassword = this.hashService.hashString(password);
@@ -94,6 +98,7 @@ public class UserController {
 
 	@PutMapping("/users/{id}")
 	@AuthGuarded
+	@AdminsOnly
 	public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest userRequest) throws NoSuchAlgorithmException {
 		User originalUser = this.userRepository.findById(id).orElse(null);
 		if (originalUser == null) {

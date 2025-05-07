@@ -1,7 +1,5 @@
 package com.uni.project.Aspects;
 
-import java.util.Optional;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
