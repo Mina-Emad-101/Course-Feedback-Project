@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.uni.project.Exceptions.JWTExpiredException;
 import com.uni.project.Models.Role;
 import com.uni.project.Models.User;
 import com.uni.project.Models.Dtos.UserWithRoleDTO;
@@ -17,6 +19,7 @@ import com.uni.project.Repositories.RoleRepository;
 import com.uni.project.Repositories.UserRepository;
 import com.uni.project.Requests.LoginRequest;
 import com.uni.project.Requests.RegisterRequest;
+import com.uni.project.Requests.VerifyTokenRequest;
 import com.uni.project.Responses.ErrorResponse;
 import com.uni.project.Responses.LoginResponse;
 import com.uni.project.Services.HashService;
@@ -75,4 +78,25 @@ public class AuthController {
 
 		return ResponseEntity.ok(new LoginResponse(token, new UserWithRoleDTO(user)));
 	}
+
+	@PostMapping("/verify-token")
+	public ResponseEntity<Object> verifyToken(@RequestBody VerifyTokenRequest verifyTokenRequest) {
+		String token = verifyTokenRequest.getToken();
+		Long id;
+		try {
+			id = this.jwtService.verify(token);
+		} catch (JWTExpiredException expiredException) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(new ErrorResponse(expiredException.getMessage()));
+		} catch (JWTVerificationException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Couldn't Verify Token"));
+		}
+		User user = this.userRepository.findById(id).orElse(null);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorResponse("User Not Found, Please Login Again"));
+		}
+		return ResponseEntity.ok(new UserWithRoleDTO(user));
+	}
+
 }
