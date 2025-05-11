@@ -1,19 +1,35 @@
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS roles;
+DROP TABLE IF EXISTS feedback_responses;
+DROP TABLE IF EXISTS feedback_forms;
+DROP TABLE IF EXISTS courses;
 
--- Create roles table
-CREATE TABLE roles (
+-- Create courses table
+CREATE TABLE courses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+	name VARCHAR(255) NOT NULL,
+	code VARCHAR(255) NOT NULL,
+    instructor_id BIGINT NOT NULL,
+    CONSTRAINT fk_instructor FOREIGN KEY (instructor_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Create users table
-CREATE TABLE users (
+-- Create forms table
+CREATE TABLE feedback_forms (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-	role_id BIGINT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+	course_id BIGINT NOT NULL,
+	created_by BIGINT NOT NULL,
+    deadline DATE,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Create responses table
+CREATE TABLE feedback_responses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+	filled_by BIGINT NOT NULL,
+	form_id BIGINT NOT NULL,
+	course_rating TINYINT NOT NULL,
+	instructor_rating TINYINT NOT NULL,
+	comment VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_form FOREIGN KEY (form_id) REFERENCES feedback_forms(id) ON DELETE CASCADE,
+    CONSTRAINT fk_filled_by FOREIGN KEY (filled_by) REFERENCES users(id) ON DELETE CASCADE
 );
