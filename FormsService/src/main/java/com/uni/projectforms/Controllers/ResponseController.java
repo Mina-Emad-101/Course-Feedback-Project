@@ -14,18 +14,26 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.uni.projectforms.Annotations.AdminsOnly;
 import com.uni.projectforms.Annotations.AuthGuarded;
+import com.uni.projectforms.Annotations.InstructorsOnly;
 import com.uni.projectforms.Annotations.StudentsOnly;
+import com.uni.projectforms.Models.Course;
 import com.uni.projectforms.Models.Form;
 import com.uni.projectforms.Models.Response;
 import com.uni.projectforms.Models.User;
 import com.uni.projectforms.Models.Dtos.ModelDTO;
 import com.uni.projectforms.Models.Dtos.ResponseBasicDTO;
+import com.uni.projectforms.Repositories.CourseRepository;
 import com.uni.projectforms.Repositories.FormRepository;
 import com.uni.projectforms.Repositories.ResponseRepository;
+import com.uni.projectforms.Repositories.UserRepository;
 import com.uni.projectforms.Requests.CreateResponseRequest;
 import com.uni.projectforms.Requests.UpdateResponseRequest;
+import com.uni.projectforms.Responses.CourseRatingsResponse;
 import com.uni.projectforms.Responses.ErrorResponse;
+import com.uni.projectforms.Responses.FormResultsResponse;
+import com.uni.projectforms.Responses.InstructorRatingsResponse;
 
 import jakarta.validation.Valid;
 
@@ -39,7 +47,10 @@ public class ResponseController {
 	private ResponseRepository responseRepository;
 
 	@Autowired
-	private FormRepository formRepository;
+	private UserRepository userRepository;
+
+	@Autowired
+	private CourseRepository courseRepository;
 
 	@GetMapping("/responses")
 	@AuthGuarded
@@ -69,29 +80,6 @@ public class ResponseController {
 		return ResponseEntity.ok(new ResponseBasicDTO(response.get()));
 	}
 
-	@PostMapping("/forms/{formID}/respond")
-	@AuthGuarded
-	@StudentsOnly
-	public ResponseEntity<Object> createResponse(@PathVariable Long formID, @RequestBody @Valid CreateResponseRequest responseRequest) {
-		User user = User.getLoggedInUser().get();
-		Form form = this.formRepository.findById(formID).orElse(null);
-		if (form == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Form Not Found"));
-		}
-
-		Response response = Response.builder()
-		.filler(user)
-		.form(form)
-		.comment(responseRequest.getComment())
-		.courseRating(responseRequest.getCourseRating())
-		.instructorRating(responseRequest.getInstructorRating())
-		.build();
-
-		Response newResponse = this.responseRepository.save(response);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseBasicDTO(newResponse));
-	}
-
 	@PutMapping("/responses/{id}")
 	@AuthGuarded
 	@StudentsOnly
@@ -113,5 +101,36 @@ public class ResponseController {
 		Response updatedResponse = this.responseRepository.save(originalResponse);
 
 		return ResponseEntity.ok(new ResponseBasicDTO(updatedResponse));
+	}
+
+	@GetMapping("/responses/ratings/instructors/{id}")
+	@AuthGuarded
+	public ResponseEntity<Object> getInstructorRatings(@PathVariable Long id) {
+		User user = this.userRepository.findById(id).orElse(null);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Instructor Not Found"));
+		}
+		System.out.println(user.toString());
+		if (!user.isInstructor()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("ID belongs to Non-Instructor"));
+		}
+
+		InstructorRatingsResponse response = this.responseRepository.getInstructorRatingsResponse(user);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/responses/ratings/courses/{id}")
+	@AuthGuarded
+	public ResponseEntity<Object> getCourseRatings(@PathVariable Long id) {
+		Optional<Course> course = this.courseRepository.findById(id);
+
+		if (course.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Not Found"));
+		}
+
+		CourseRatingsResponse response = this.responseRepository.getCourseRatingsResponse(course.get());
+
+		return ResponseEntity.ok(response);
 	}
 }

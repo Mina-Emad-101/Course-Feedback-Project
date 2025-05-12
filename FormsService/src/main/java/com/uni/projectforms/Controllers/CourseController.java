@@ -24,9 +24,11 @@ import com.uni.projectforms.Repositories.CourseRepository;
 import com.uni.projectforms.Repositories.UserRepository;
 import com.uni.projectforms.Requests.CreateCourseRequest;
 import com.uni.projectforms.Requests.UpdateCourseRequest;
+import com.uni.projectforms.Responses.CourseRatingsResponse;
 import com.uni.projectforms.Responses.ErrorResponse;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * CourseController
@@ -37,14 +39,17 @@ public class CourseController {
 	@Autowired
 	private CourseRepository courseRepository;
 
-	@Autowired
-	private UserRepository userRepository;
-
 	@GetMapping("/courses")
 	@AuthGuarded
 	public ResponseEntity<Object> getCourses() {
-		List<ModelDTO> courses = new ArrayList<ModelDTO>();
-		this.courseRepository.findAll().forEach((Course course) -> courses.add(new CourseBasicDTO(course)));
+		List<CourseBasicDTO> courses = new ArrayList<CourseBasicDTO>();
+		User loggedInUser = User.getLoggedInUser().get();
+		if (loggedInUser.isInstructor()) {
+			this.courseRepository.findByInstructor(loggedInUser)
+					.forEach((Course course) -> courses.add(new CourseBasicDTO(course)));
+		} else {
+			this.courseRepository.findAll().forEach((Course course) -> courses.add(new CourseBasicDTO(course)));
+		}
 		return ResponseEntity.ok(courses);
 	}
 
@@ -66,10 +71,10 @@ public class CourseController {
 		User user = User.getLoggedInUser().get();
 
 		Course course = Course.builder()
-		.name(courseRequest.getName())
-		.code(courseRequest.getCode())
-		.instructor(user)
-		.build();
+				.name(courseRequest.getName())
+				.code(courseRequest.getCode())
+				.instructor(user)
+				.build();
 
 		Course newCourse = this.courseRepository.save(course);
 
@@ -79,7 +84,8 @@ public class CourseController {
 	@PutMapping("/courses/{id}")
 	@AuthGuarded
 	@InstructorsOnly
-	public ResponseEntity<Object> updateCourse(@PathVariable Long id, @RequestBody @Valid UpdateCourseRequest courseRequest) {
+	public ResponseEntity<Object> updateCourse(@PathVariable Long id,
+			@RequestBody @Valid UpdateCourseRequest courseRequest) {
 		Course originalCourse = this.courseRepository.findById(id).orElse(null);
 		if (originalCourse == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Course Not Found"));
@@ -88,7 +94,8 @@ public class CourseController {
 		User user = User.getLoggedInUser().get();
 
 		if (user.getId() != originalCourse.getInstructor().getId()) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Course belongs to another instructor"));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(new ErrorResponse("Course belongs to another instructor"));
 		}
 
 		originalCourse.setName(courseRequest.getName());

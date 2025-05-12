@@ -30,7 +30,7 @@ public class JWTService {
 
 	@PostConstruct
 	private void init() {
-		System.out.println("Loaded base URL: " + this.userServiceUrl);
+		System.out.println("Loaded User Service BaseURL: " + this.userServiceUrl);
 		this.restClient = builder.baseUrl(this.userServiceUrl).build();
 	}
 

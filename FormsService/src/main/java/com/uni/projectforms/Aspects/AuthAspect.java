@@ -56,9 +56,11 @@ public class AuthAspect {
 					.body(new ErrorResponse("User Not Found, Please Login Again"));
 		}
 		User.setLoggedInUser(user);
+		User.setBearerToken(token);
 
 		Object result = joinPoint.proceed();
 		User.resetLoggedInUser();
+		User.resetBearerToken();
 		return result;
 	}
 }

@@ -31,13 +31,13 @@ import lombok.NoArgsConstructor;
 public class User {
 
 	private static Optional<User> loggedInUser = Optional.empty();
+	private static Optional<String> bearerToken = Optional.empty();
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private String email;
-	private String password;
 
 	@ManyToOne
 	@JoinColumn(name = "role_id", nullable = false)
@@ -64,6 +64,18 @@ public class User {
 		User.loggedInUser = Optional.empty();
 	}
 
+	public static Optional<String> getBearerToken() {
+		return User.bearerToken;
+	}
+
+	public static void setBearerToken(String token) {
+		User.bearerToken = Optional.of(token);
+	}
+
+	public static void resetBearerToken() {
+		User.bearerToken = Optional.empty();
+	}
+
 	public Boolean isAdmin() {
 		return this.role.getId() == Role.getAdminRoleID();
 	}
@@ -78,6 +90,6 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "{ id: " + this.id + ", email: " + this.email + ", course: " + this.role.getName() + " }";
+		return "{ id: " + this.id + ", email: " + this.email + ", name: " + this.name + ", role: " + this.role.toString() + " }";
 	}
 }

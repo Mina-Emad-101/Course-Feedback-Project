@@ -42,4 +42,9 @@ public class Role {
 	public static Long getStudentRoleID() {
 		return (long)(RoleType.STUDENT.ordinal() + 1);
 	}
+
+	@Override
+	public String toString() {
+		return "{ id: " + this.id + ", name: " + this.name + " }";
+	}
 }

@@ -48,7 +48,6 @@ public class UserController {
 
 	@GetMapping("/users")
 	@AuthGuarded
-	@AdminsOnly
 	public ResponseEntity<Object> getUsers() {
 		Iterable<User> users = this.userRepository.findAll();
 		List<ModelDTO> usersDTO = new ArrayList<ModelDTO>();
@@ -61,7 +60,6 @@ public class UserController {
 
 	@GetMapping("/users/{id}")
 	@AuthGuarded
-	@AdminsOnly
 	public ResponseEntity<Object> getUser(@PathVariable Long id) {
 		Optional<User> user = this.userRepository.findById(id);
 
