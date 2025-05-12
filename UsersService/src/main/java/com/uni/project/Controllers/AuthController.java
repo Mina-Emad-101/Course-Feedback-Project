@@ -21,7 +21,6 @@ import com.uni.project.Repositories.RoleRepository;
 import com.uni.project.Repositories.UserRepository;
 import com.uni.project.Requests.LoginRequest;
 import com.uni.project.Requests.RegisterRequest;
-import com.uni.project.Requests.VerifyTokenRequest;
 import com.uni.project.Responses.ErrorResponse;
 import com.uni.project.Responses.LoginResponse;
 import com.uni.project.Services.HashService;
