@@ -21,11 +21,11 @@ CREATE TABLE IF NOT EXISTS feedback_forms (
 -- Create responses table
 CREATE TABLE IF NOT EXISTS feedback_responses (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	filled_by BIGINT NOT NULL,
+	student_id BIGINT NOT NULL,
 	form_id BIGINT NOT NULL,
 	course_rating TINYINT NOT NULL,
 	instructor_rating TINYINT NOT NULL,
 	comment VARCHAR(255) NOT NULL,
     CONSTRAINT fk_form FOREIGN KEY (form_id) REFERENCES feedback_forms(id) ON DELETE CASCADE,
-    CONSTRAINT fk_filled_by FOREIGN KEY (filled_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );

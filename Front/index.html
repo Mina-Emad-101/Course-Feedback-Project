@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Feedback System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="landing-container">
+        <header class="landing-header" style="margin-bottom: 100px;">
+            <h1>Course Feedback System</h1>
+        </header>
+        
+        <div class="auth-options">
+            <div class="auth-card" id="student-login">
+                <div class="auth-icon">🎓</div>
+                <h3>Student</h3>
+                <p>Submit anonymous feedback about your courses</p>
+                <button class="btn-primary " onclick="location.href='student/dashboard.html'" style="padding: 8px 30px ;">Login</button>
+            </div>
+            
+            <div class="auth-card" id="instructor-login">
+                <div class="auth-icon">👨‍🏫</div>
+                <h3>Instructor</h3>
+                <p>View feedback summary for your courses</p>
+                <button class="btn-primary" onclick="location.href='instructor/dashboard.html'" style="padding: 8px 30px">Login</button>
+            </div>
+            
+            <div class="auth-card" id="admin-login">
+                <div class="auth-icon">🔧</div>
+                <h3>Administrator</h3>
+                <p>Manage feedback forms and view reports</p>
+                <button class="btn-primary" onclick="location.href='admin/dashboard.html'" style="padding: 8px 30px">Login</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

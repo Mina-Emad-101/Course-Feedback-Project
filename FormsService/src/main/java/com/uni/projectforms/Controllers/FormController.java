@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uni.projectforms.Annotations.AuthGuarded;
+import com.uni.projectforms.Annotations.InstructorsOnly;
 import com.uni.projectforms.Annotations.StudentsOnly;
 import com.uni.projectforms.Annotations.AdminsOnly;
 import com.uni.projectforms.Models.Course;
@@ -126,7 +127,7 @@ public class FormController {
 		}
 
 		Response response = Response.builder()
-		.filler(user)
+		.student(user)
 		.form(form)
 		.comment(responseRequest.getComment())
 		.courseRating(responseRequest.getCourseRating())
@@ -140,7 +141,7 @@ public class FormController {
 
 	@GetMapping("/forms/{formID}/results")
 	@AuthGuarded
-	@AdminsOnly
+	@InstructorsOnly
 	public ResponseEntity<Object> getResults(@PathVariable Long formID) {
 		Form form = this.formRepository.findById(formID).orElse(null);
 		if (form == null) {

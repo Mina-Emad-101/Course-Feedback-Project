@@ -1,7 +1,5 @@
 package com.uni.projectforms.Models.Dtos;
 
-import java.time.LocalDate;
-
 import com.uni.projectforms.Models.Response;
 
 /**
@@ -12,16 +10,14 @@ public class ResponseBasicDTO implements ModelDTO {
 	private String comment;
 	private Integer courseRating;
 	private Integer instructorRating;
-	private Long formID;
-	private Long fillerID;
+	private ModelDTO form;
 
 	public ResponseBasicDTO(Response response) {
 		this.id = response.getId();
 		this.comment = response.getComment();
 		this.courseRating = response.getCourseRating();
 		this.instructorRating = response.getInstructorRating();
-		this.formID = response.getForm().getId();
-		this.fillerID = response.getFiller().getId();
+		this.form = new FormBasicDTO(response.getForm());
 	}
 
 	public Long getId() {
@@ -56,19 +52,11 @@ public class ResponseBasicDTO implements ModelDTO {
 		this.instructorRating = instructorRating;
 	}
 
-	public Long getFormID() {
-		return formID;
+	public ModelDTO getForm() {
+		return form;
 	}
 
-	public void setFormID(Long formID) {
-		this.formID = formID;
-	}
-
-	public Long getFillerID() {
-		return fillerID;
-	}
-
-	public void setFillerID(Long fillerID) {
-		this.fillerID = fillerID;
+	public void setForm(ModelDTO form) {
+		this.form = form;
 	}
 }

@@ -46,7 +46,7 @@ public class User {
 	@OneToMany(mappedBy = "instructor")
 	private List<Course> courses;
 
-	@OneToMany(mappedBy = "filler")
+	@OneToMany(mappedBy = "student")
 	private List<Response> responses;
 
 	@CreationTimestamp

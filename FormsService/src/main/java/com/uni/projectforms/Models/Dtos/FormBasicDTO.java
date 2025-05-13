@@ -11,15 +11,15 @@ public class FormBasicDTO implements ModelDTO {
 	private Long id;
 	private LocalDate deadline;
 	private Boolean isActive;
-	private Long courseID;
-	private Long creatorID;
+	private ModelDTO course;
+	private ModelDTO creator;
 
 	public FormBasicDTO(Form form) {
 		this.id = form.getId();
 		this.deadline = form.getDeadline();
 		this.isActive = form.getIsActive();
-		this.courseID = form.getCourse().getId();
-		this.creatorID = form.getCreator().getId();
+		this.course = new CourseWithInstructorDTO(form.getCourse());
+		this.creator = new UserWithRoleDTO(form.getCreator());
 	}
 
 	public Long getId() {
@@ -46,19 +46,19 @@ public class FormBasicDTO implements ModelDTO {
 		this.isActive = isActive;
 	}
 
-	public Long getCourseID() {
-		return courseID;
+	public ModelDTO getCourse() {
+		return course;
 	}
 
-	public void setCourseID(Long courseID) {
-		this.courseID = courseID;
+	public void setCourse(ModelDTO course) {
+		this.course = course;
 	}
 
-	public Long getCreatorID() {
-		return creatorID;
+	public ModelDTO getCreator() {
+		return creator;
 	}
 
-	public void setCreatorID(Long creatorID) {
-		this.creatorID = creatorID;
+	public void setCreator(ModelDTO creator) {
+		this.creator = creator;
 	}
 }

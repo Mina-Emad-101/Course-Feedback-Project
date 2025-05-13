@@ -9,30 +9,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uni.projectforms.Annotations.AdminsOnly;
 import com.uni.projectforms.Annotations.AuthGuarded;
-import com.uni.projectforms.Annotations.InstructorsOnly;
 import com.uni.projectforms.Annotations.StudentsOnly;
 import com.uni.projectforms.Models.Course;
-import com.uni.projectforms.Models.Form;
 import com.uni.projectforms.Models.Response;
 import com.uni.projectforms.Models.User;
 import com.uni.projectforms.Models.Dtos.ModelDTO;
 import com.uni.projectforms.Models.Dtos.ResponseBasicDTO;
 import com.uni.projectforms.Repositories.CourseRepository;
-import com.uni.projectforms.Repositories.FormRepository;
 import com.uni.projectforms.Repositories.ResponseRepository;
 import com.uni.projectforms.Repositories.UserRepository;
-import com.uni.projectforms.Requests.CreateResponseRequest;
 import com.uni.projectforms.Requests.UpdateResponseRequest;
 import com.uni.projectforms.Responses.CourseRatingsResponse;
 import com.uni.projectforms.Responses.ErrorResponse;
-import com.uni.projectforms.Responses.FormResultsResponse;
 import com.uni.projectforms.Responses.InstructorRatingsResponse;
 
 import jakarta.validation.Valid;
@@ -58,7 +51,7 @@ public class ResponseController {
 		List<ModelDTO> responses = new ArrayList<ModelDTO>();
 		User loggedInUser = User.getLoggedInUser().get();
 		if (loggedInUser.isStudent()) {
-			this.responseRepository.findByFiller(loggedInUser).forEach((Response response) -> responses.add(new ResponseBasicDTO(response)));
+			this.responseRepository.findByStudent(loggedInUser).forEach((Response response) -> responses.add(new ResponseBasicDTO(response)));
 		} else {
 			this.responseRepository.findAll().forEach((Response response) -> responses.add(new ResponseBasicDTO(response)));
 		}
@@ -74,7 +67,7 @@ public class ResponseController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Not Found"));
 		}
 		User loggedInUser = User.getLoggedInUser().get();
-		if (loggedInUser.isStudent() && loggedInUser.getId() != response.get().getFiller().getId()) {
+		if (loggedInUser.isStudent() && loggedInUser.getId() != response.get().getStudent().getId()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Response belongs to another Student"));
 		}
 		return ResponseEntity.ok(new ResponseBasicDTO(response.get()));
@@ -90,7 +83,7 @@ public class ResponseController {
 		}
 
 		User loggedInUser = User.getLoggedInUser().get();
-		if (loggedInUser.isStudent() && loggedInUser.getId() != originalResponse.getFiller().getId()) {
+		if (loggedInUser.isStudent() && loggedInUser.getId() != originalResponse.getStudent().getId()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Response belongs to another Student"));
 		}
 

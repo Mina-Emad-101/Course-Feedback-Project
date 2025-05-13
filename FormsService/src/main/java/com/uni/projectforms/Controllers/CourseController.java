@@ -20,6 +20,7 @@ import com.uni.projectforms.Models.Course;
 import com.uni.projectforms.Models.User;
 import com.uni.projectforms.Models.Dtos.ModelDTO;
 import com.uni.projectforms.Models.Dtos.CourseBasicDTO;
+import com.uni.projectforms.Models.Dtos.CourseWithInstructorDTO;
 import com.uni.projectforms.Repositories.CourseRepository;
 import com.uni.projectforms.Repositories.UserRepository;
 import com.uni.projectforms.Requests.CreateCourseRequest;
@@ -42,13 +43,13 @@ public class CourseController {
 	@GetMapping("/courses")
 	@AuthGuarded
 	public ResponseEntity<Object> getCourses() {
-		List<CourseBasicDTO> courses = new ArrayList<CourseBasicDTO>();
+		List<ModelDTO> courses = new ArrayList<ModelDTO>();
 		User loggedInUser = User.getLoggedInUser().get();
 		if (loggedInUser.isInstructor()) {
 			this.courseRepository.findByInstructor(loggedInUser)
-					.forEach((Course course) -> courses.add(new CourseBasicDTO(course)));
+					.forEach((Course course) -> courses.add(new CourseWithInstructorDTO(course)));
 		} else {
-			this.courseRepository.findAll().forEach((Course course) -> courses.add(new CourseBasicDTO(course)));
+			this.courseRepository.findAll().forEach((Course course) -> courses.add(new CourseWithInstructorDTO(course)));
 		}
 		return ResponseEntity.ok(courses);
 	}
@@ -61,7 +62,7 @@ public class CourseController {
 		if (course.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Not Found"));
 		}
-		return ResponseEntity.ok(new CourseBasicDTO(course.get()));
+		return ResponseEntity.ok(new CourseWithInstructorDTO(course.get()));
 	}
 
 	@PostMapping("/courses")

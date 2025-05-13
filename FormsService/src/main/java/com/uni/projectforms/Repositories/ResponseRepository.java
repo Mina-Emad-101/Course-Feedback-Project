@@ -19,7 +19,7 @@ import com.uni.projectforms.Responses.InstructorRatingsResponse;
  */
 public interface ResponseRepository extends CrudRepository<Response, Long> {
 
-	public List<Response> findByFiller(User filler);
+	public List<Response> findByStudent(User student);
 
 	@Query("""
 			SELECT new com.uni.projectforms.Responses.InstructorRatingsResponse(
@@ -56,7 +56,7 @@ public interface ResponseRepository extends CrudRepository<Response, Long> {
 			SELECT COUNT(r.id)
 			FROM Response r
 			WHERE r.form = :form
-			AND r.filler = :student
+			AND r.student = :student
 			""")
 	public Long getStudentResponsesCountByForm(@Param("student") User student, @Param("form") Form form);
 }

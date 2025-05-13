@@ -38,6 +38,6 @@ public class Response {
 	private Form form;
 
 	@ManyToOne
-	@JoinColumn(name = "filled_by", nullable = false)
-	private User filler;
+	@JoinColumn(name = "student_id", nullable = false)
+	private User student;
 }

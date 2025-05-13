@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | Course Feedback</title>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-graduation-cap"></i> Student</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="feedback.html"><i class="fas fa-edit"></i> Give Feedback</a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> Help</a></li>
+                <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+        
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">My Courses</h1>
+                <div class="user-info">
+                    <div class="user-avatar">JD</div>
+                    <span>John Doe</span>
+                </div>
+            </div>
+            
+            <div class="card welcome-card">
+                <h2>Welcome back, John!</h2>
+                <p>You have 3 courses pending for feedback this semester.</p>
+            </div>
+            
+            <div class="courses-grid">
+                <div class="course-card">
+                    <h3>CS101 - Introduction to Programming</h3>
+                    <p>Instructor: Dr. Smith</p>
+                    <div class="status pending">Pending Feedback</div>
+                    <button class="btn btn-primary" onclick="location.href='feedback.html?course=CS101'">
+                        <i class="fas fa-edit"></i> Give Feedback
+                    </button>
+                </div>
+                
+                <div class="course-card">
+                    <h3>MATH201 - Calculus II</h3>
+                    <p>Instructor: Prof. Johnson</p>
+                    <div class="status pending">Pending Feedback</div>
+                    <button class="btn btn-primary" onclick="location.href='feedback.html?course=MATH201'">
+                        <i class="fas fa-edit"></i> Give Feedback
+                    </button>
+                </div>
+                
+                <div class="course-card completed">
+                    <h3>ENG102 - Academic Writing</h3>
+                    <p>Instructor: Dr. Williams</p>
+                    <div class="status completed">Feedback Submitted</div>
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-check"></i> Completed
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../script.js"></script>
+    <script>
+        // Initialize student dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active user
+            document.getElementById('user-name').textContent = 'John Doe';
+            document.getElementById('user-email').textContent = 'john.doe@university.edu';
+            
+            // Load courses from API in a real implementation
+            console.log('Student dashboard loaded');
+        });
+    </script>
+</body>
+</html>

@@ -1,8 +1,9 @@
-package com.uni.project.Models.Dtos;
+package com.uni.projectforms.Models.Dtos;
 
 import java.sql.Timestamp;
 
-import com.uni.project.Models.User;
+import com.uni.projectforms.Models.Role;
+import com.uni.projectforms.Models.User;
 
 import lombok.Data;
 
@@ -15,14 +16,14 @@ public class UserWithRoleDTO implements ModelDTO {
 	private Long id;
 	private String name;
 	private String email;
-	private ModelDTO role;
+	private Role role;
 	private Timestamp created_at;
 
 	public UserWithRoleDTO(User user) {
 		this.id = user.getId();
 		this.name = user.getName();
 		this.email = user.getEmail();
-		this.role = new RoleBasicDTO(user.getRole());
+		this.role = user.getRole();
 		this.created_at = user.getCreated_at();
 	}
 }

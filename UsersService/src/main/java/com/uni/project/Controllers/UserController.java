@@ -53,7 +53,7 @@ public class UserController {
 		List<ModelDTO> usersDTO = new ArrayList<ModelDTO>();
 
 		for (User user : users) {
-			usersDTO.add(new UserBasicDTO(user));
+			usersDTO.add(new UserWithRoleDTO(user));
 		}
 		return ResponseEntity.ok(usersDTO);
 	}
@@ -96,7 +96,6 @@ public class UserController {
 
 	@PutMapping("/users/{id}")
 	@AuthGuarded
-	@AdminsOnly
 	public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody @Valid UpdateUserRequest userRequest) throws NoSuchAlgorithmException {
 		User originalUser = this.userRepository.findById(id).orElse(null);
 		if (originalUser == null) {
