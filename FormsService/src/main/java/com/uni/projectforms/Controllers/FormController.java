@@ -1,5 +1,7 @@
 package com.uni.projectforms.Controllers;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import com.uni.projectforms.Models.User;
 import com.uni.projectforms.Models.Dtos.ModelDTO;
 import com.uni.projectforms.Models.Dtos.ResponseBasicDTO;
 import com.uni.projectforms.Models.Dtos.FormBasicDTO;
+import com.uni.projectforms.Models.Dtos.FormEmptyDTO;
 import com.uni.projectforms.Repositories.FormRepository;
 import com.uni.projectforms.Repositories.ResponseRepository;
 import com.uni.projectforms.Repositories.CourseRepository;
@@ -34,6 +37,7 @@ import com.uni.projectforms.Requests.UpdateFormRequest;
 import com.uni.projectforms.Responses.ErrorResponse;
 import com.uni.projectforms.Responses.FormResultsResponse;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 /**
@@ -73,6 +77,7 @@ public class FormController {
 	@PostMapping("/forms")
 	@AuthGuarded
 	@AdminsOnly
+	@Transactional
 	public ResponseEntity<Object> createForm(@RequestBody @Valid CreateFormRequest formRequest) {
 		User user = User.getLoggedInUser().get();
 		Course course = this.courseRepository.findById(formRequest.getCourseID()).orElse(null);
@@ -89,7 +94,7 @@ public class FormController {
 
 		Form newForm = this.formRepository.save(form);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(new FormBasicDTO(newForm));
+		return ResponseEntity.status(HttpStatus.CREATED).body(new FormEmptyDTO(newForm));
 	}
 
 	@PutMapping("/forms/{id}")

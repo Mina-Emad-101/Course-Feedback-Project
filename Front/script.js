@@ -1,306 +1,221 @@
-// Global variables
-let currentUser = null;
-const courses = [
-    { id: 1, code: "CS101", name: "Introduction to Computer Science", instructor: "Dr. Smith" },
-    { id: 2, code: "MATH201", name: "Calculus II", instructor: "Prof. Johnson" },
-    { id: 3, code: "ENG102", name: "Academic Writing", instructor: "Dr. Williams" }
-];
+// Global utility functions for the feedback system
 
-// Sample feedback data
-const feedbackData = {
-    "CS101": {
-        ratings: [4, 5, 3, 4, 5, 4, 3, 5, 4, 5],
-        comments: [
-            "Great course, learned a lot!",
-            "The instructor was very knowledgeable.",
-            "Some assignments were too difficult."
-        ]
-    },
-    "MATH201": {
-        ratings: [3, 4, 2, 3, 4, 3, 2, 4, 3, 4],
-        comments: [
-            "Challenging but rewarding.",
-            "Could use more examples in lectures.",
-            "Office hours were very helpful."
-        ]
-    },
-    "ENG102": {
-        ratings: [5, 4, 5, 5, 4, 5, 4, 5, 5, 4],
-        comments: [
-            "Best writing course I've taken!",
-            "Feedback on assignments was very detailed.",
-            "Really improved my writing skills."
-        ]
+/**
+ * Check if user is authenticated and redirect if not
+ * @returns {Object|null} User object if authenticated, null otherwise
+ */
+function checkAuth() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        window.location.href = '/index.html';
+        return null;
     }
-};
-
-// Utility functions
-function calculateAverageRating(ratings) {
-    if (ratings.length === 0) return 0;
-    const sum = ratings.reduce((a, b) => a + b, 0);
-    return (sum / ratings.length).toFixed(1);
+	console.log(user);
+    return user;
 }
 
-function getRandomColor() {
-    const colors = ['#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', '#f72585', '#b5179e', '#7209b7'];
-    return colors[Math.floor(Math.random() * colors.length)];
+/**
+ * Logout the current user
+ */
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = '/index.html';
 }
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', function() {
-    // Check if we're on a dashboard page
-    if (document.querySelector('.dashboard')) {
-        initializeDashboard();
+/**
+ * Format date to a readable string
+ * @param {string} dateString - ISO date string
+ * @returns {string} Formatted date
+ */
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+/**
+ * Generate star rating HTML
+ * @param {number} rating - Rating value (0-5)
+ * @param {boolean} interactive - Whether stars should be clickable
+ * @param {string} inputName - Name for radio inputs if interactive
+ * @returns {string} HTML for star rating
+ */
+function generateStarRating(rating, interactive = false, inputName = '') {
+    rating = parseFloat(rating) || 0;
+    let html = '<div class="star-rating">';
+    
+    if (interactive) {
+        for (let i = 5; i >= 1; i--) {
+            html += `
+                <input type="radio" id="${inputName}-${i}" name="${inputName}" value="${i}" ${i === Math.round(rating) ? 'checked' : ''}>
+                <label for="${inputName}-${i}"><i class="bi bi-star-fill"></i></label>
+            `;
+        }
+    } else {
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                html += '<i class="bi bi-star-fill"></i>';
+            } else if (i - 0.5 <= rating) {
+                html += '<i class="bi bi-star-half"></i>';
+            } else {
+                html += '<i class="bi bi-star"></i>';
+            }
+        }
+        html += ` <span class="small text-muted">(${rating.toFixed(1)})</span>`;
     }
     
-    // Initialize rating stars
-    document.querySelectorAll('.rating-stars .star').forEach(star => {
-        star.addEventListener('click', function() {
-            const stars = this.parentElement.querySelectorAll('.star');
-            const rating = parseInt(this.getAttribute('data-value'));
-            
-            stars.forEach((s, index) => {
-                if (index < rating) {
-                    s.classList.add('active');
-                } else {
-                    s.classList.remove('active');
-                }
-            });
-            
-            // Update hidden input if exists
-            const hiddenInput = this.parentElement.nextElementSibling;
-            if (hiddenInput && hiddenInput.type === 'hidden') {
-                hiddenInput.value = rating;
-            }
-        });
-    });
-});
+    html += '</div>';
+    return html;
+}
 
-function initializeDashboard() {
-    // Load user data from session (simulated)
-    const userType = window.location.pathname.split('/')[1];
-    currentUser = {
-        id: 1,
-        name: userType === 'student' ? 'John Doe' : userType === 'instructor' ? 'Dr. Smith' : 'Admin User',
-        email: `${userType}@university.edu`,
-        type: userType
+/**
+ * Initialize the navigation bar based on user role
+ * @param {string} currentPage - Current page name for highlighting
+ */
+function initNavbar(currentPage) {
+    const user = checkAuth();
+    if (!user) return;
+    
+    const navbar = document.getElementById('mainNavbar');
+    if (!navbar) return;
+    
+    // Set role-specific styling
+    document.querySelector('body').classList.add(`${user.role.name.toLowerCase()}-theme`);
+    
+    // Initialize user info
+    const userDisplay = document.getElementById('userDisplay');
+    if (userDisplay) {
+        userDisplay.innerHTML = `
+            <span class="avatar-circle">${user.email.charAt(0).toUpperCase()}</span>
+            <div class="ms-2">
+                <div class="fw-bold">${user.email}</div>
+                <div class="small text-muted text-capitalize">${user.role.name}</div>
+            </div>
+        `;
+    }
+    
+    // Highlight current page
+    const activeLink = navbar.querySelector(`[data-page="${currentPage}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+    
+    // Initialize logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+}
+
+/**
+ * Create a chart using Chart.js
+ * @param {string} canvasId - Canvas element ID
+ * @param {string} type - Chart type (bar, line, pie, etc.)
+ * @param {Object} data - Chart data
+ * @param {Object} options - Chart options
+ * @returns {Chart} Chart instance
+ */
+function createChart(canvasId, type, data, options = {}) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    // Default options
+    const defaultOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+            }
+        }
     };
     
-    document.getElementById('user-name').textContent = currentUser.name;
-    document.getElementById('user-email').textContent = currentUser.email;
+    // Merge default options with provided options
+    const chartOptions = { ...defaultOptions, ...options };
     
-    // Load appropriate content based on user type
-    if (currentUser.type === 'student') {
-        loadStudentDashboard();
-    } else if (currentUser.type === 'instructor') {
-        loadInstructorDashboard();
-    } else if (currentUser.type === 'admin') {
-        loadAdminDashboard();
-    }
-}
-
-function loadStudentDashboard() {
-    // Load courses available for feedback
-    const courseList = document.getElementById('course-list');
-    if (courseList) {
-        courses.forEach(course => {
-            const courseCard = document.createElement('div');
-            courseCard.className = 'card';
-            courseCard.innerHTML = `
-                <h3>${course.code} - ${course.name}</h3>
-                <p>Instructor: ${course.instructor}</p>
-                <button class="btn-primary" onclick="location.href='feedback.html?course=${course.code}'">Provide Feedback</button>
-            `;
-            courseList.appendChild(courseCard);
-        });
-    }
-}
-
-function loadInstructorDashboard() {
-    // Load feedback summary for instructor's courses
-    const summarySection = document.getElementById('feedback-summary');
-    if (summarySection) {
-        // Simulate instructor only seeing their own courses
-        const instructorCourses = courses.filter(c => c.instructor === currentUser.name);
-        
-        if (instructorCourses.length === 0) {
-            summarySection.innerHTML = '<p>No courses assigned to you.</p>';
-            return;
-        }
-        
-        instructorCourses.forEach(course => {
-            const feedback = feedbackData[course.code] || { ratings: [], comments: [] };
-            const avgRating = calculateAverageRating(feedback.ratings);
-            
-            const summaryCard = document.createElement('div');
-            summaryCard.className = 'card summary-card';
-            summaryCard.innerHTML = `
-                <div class="summary-icon">📊</div>
-                <div class="summary-info">
-                    <h3>${course.code} - ${course.name}</h3>
-                    <div class="rating">
-                        <span class="average-rating">${avgRating}</span>/5 (${feedback.ratings.length} responses)
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: ${(avgRating / 5) * 100}%"></div>
-                    </div>
-                    <button class="btn-secondary" onclick="viewFeedbackDetails('${course.code}')">View Details</button>
-                </div>
-            `;
-            summarySection.appendChild(summaryCard);
-        });
-    }
-}
-
-function loadAdminDashboard() {
-    // Load all feedback data for admin
-    const adminSummary = document.getElementById('admin-summary');
-    if (adminSummary) {
-        courses.forEach(course => {
-            const feedback = feedbackData[course.code] || { ratings: [], comments: [] };
-            const avgRating = calculateAverageRating(feedback.ratings);
-            
-            const summaryCard = document.createElement('div');
-            summaryCard.className = 'card summary-card';
-            summaryCard.innerHTML = `
-                <div class="summary-icon">📝</div>
-                <div class="summary-info">
-                    <h3>${course.code} - ${course.name}</h3>
-                    <p>Instructor: ${course.instructor}</p>
-                    <div class="rating">
-                        <span class="average-rating">${avgRating}</span>/5 (${feedback.ratings.length} responses)
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: ${(avgRating / 5) * 100}%"></div>
-                    </div>
-                    <div class="admin-actions">
-                        <button class="btn-secondary" onclick="viewFeedbackDetails('${course.code}')">View Feedback</button>
-                        <button class="btn-secondary" onclick="exportFeedback('${course.code}')">Export</button>
-                    </div>
-                </div>
-            `;
-            adminSummary.appendChild(summaryCard);
-        });
-    }
-}
-
-// Functions for all user types
-function viewFeedbackDetails(courseCode) {
-    // In a real app, this would fetch detailed feedback for the course
-    const course = courses.find(c => c.code === courseCode);
-    const feedback = feedbackData[courseCode] || { ratings: [], comments: [] };
-    const avgRating = calculateAverageRating(feedback.ratings);
-    
-    // Create modal with feedback details
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Feedback Details: ${courseCode} - ${course.name}</h2>
-            <p>Instructor: ${course.instructor}</p>
-            
-            <div class="feedback-stats">
-                <div class="stat-card">
-                    <h3>Average Rating</h3>
-                    <div class="stat-value">${avgRating}/5</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Responses</h3>
-                    <div class="stat-value">${feedback.ratings.length}</div>
-                </div>
-            </div>
-            
-            <h3>Rating Distribution</h3>
-            <div class="rating-distribution">
-                ${[5, 4, 3, 2, 1].map(star => {
-                    const count = feedback.ratings.filter(r => r === star).length;
-                    const percentage = feedback.ratings.length > 0 ? (count / feedback.ratings.length) * 100 : 0;
-                    return `
-                        <div class="star-row">
-                            <span>${star} ★</span>
-                            <div class="bar-container">
-                                <div class="bar" style="width: ${percentage}%; background: ${getRandomColor()}"></div>
-                            </div>
-                            <span>${count} (${percentage.toFixed(1)}%)</span>
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-            
-            <h3>Student Comments</h3>
-            <div class="comments-section">
-                ${feedback.comments.length > 0 ? 
-                    feedback.comments.map(comment => `<div class="comment-card">"${comment}"</div>`).join('') : 
-                    '<p>No comments available.</p>'}
-            </div>
-            
-            ${currentUser.type === 'admin' ? `
-                <div class="modal-actions">
-                    <button class="btn-primary" onclick="exportFeedback('${courseCode}')">Export Feedback</button>
-                </div>
-            ` : ''}
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Close modal
-    modal.querySelector('.close-modal').addEventListener('click', () => {
-        document.body.removeChild(modal);
-    });
-    
-    // Close when clicking outside
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
-        }
+    return new Chart(ctx, {
+        type: type,
+        data: data,
+        options: chartOptions
     });
 }
 
-function exportFeedback(courseCode) {
-    // In a real app, this would generate a CSV or PDF report
-    console.log(`Exporting feedback for ${courseCode}`);
-    alert(`Feedback for ${courseCode} exported successfully!`);
+/**
+ * Display an error message
+ * @param {string} message - Error message to display
+ * @param {string} elementId - ID of element to show error in
+ */
+function showError(message, elementId = 'errorMessage') {
+    const errorElement = document.getElementById(elementId);
+    if (errorElement) {
+        errorElement.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    } else {
+        console.error(message);
+    }
 }
 
-// Form submission
-function submitFeedbackForm(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const courseCode = new URLSearchParams(window.location.search).get('course');
-    const rating = form.querySelector('input[name="rating"]').value;
-    const comments = form.querySelector('textarea[name="comments"]').value;
-    
-    // In a real app, this would send data to the server
-    console.log(`Feedback submitted for ${courseCode}: Rating=${rating}, Comments=${comments}`);
-    
-    // Show success message
-    alert('Thank you for your feedback! Your response has been recorded anonymously.');
-    
-    // Redirect back to dashboard
-    setTimeout(() => {
-        window.location.href = 'dashboard.html';
-    }, 1500);
+/**
+ * Display a success message
+ * @param {string} message - Success message to display
+ * @param {string} elementId - ID of element to show message in
+ */
+function showSuccess(message, elementId = 'successMessage') {
+    const successElement = document.getElementById(elementId);
+    if (successElement) {
+        successElement.innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
 }
 
-// Admin functions
-function createFeedbackForm(event) {
-    event.preventDefault();
+/**
+ * Export data to CSV format
+ * @param {Array} data - Array of objects to export
+ * @param {string} filename - File name for the download
+ */
+function exportToCSV(data, filename) {
+    if (!data || !data.length) {
+        showError('No data to export');
+        return;
+    }
     
-    const form = event.target;
-    const formName = form.querySelector('input[name="formName"]').value;
-    const courseCode = form.querySelector('select[name="courseCode"]').value;
-    const questions = form.querySelector('textarea[name="questions"]').value;
+    // Get headers from the first object
+    const headers = Object.keys(data[0]);
     
-    // In a real app, this would send data to the server
-    console.log(`New feedback form created: ${formName} for ${courseCode}`);
-    console.log(`Questions: ${questions}`);
+    // Create CSV content
+    let csvContent = headers.join(',') + '\n';
     
-    // Show success message
-    alert('Feedback form created successfully!');
+    data.forEach(item => {
+        const values = headers.map(header => {
+            const value = item[header];
+            // Handle string values that might contain commas
+            return typeof value === 'string' && value.includes(',') 
+                ? `"${value}"`
+                : value;
+        });
+        csvContent += values.join(',') + '\n';
+    });
     
-    // Reset form
-    form.reset();
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }

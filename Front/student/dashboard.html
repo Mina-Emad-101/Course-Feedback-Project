@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Feedback System</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="dashboard.html">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                <span class="student-accent">Student Portal</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav" id="mainNavbar">
+                    <li class="nav-item">
+                        <a class="nav-link" data-page="dashboard" href="dashboard.html">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="d-flex align-items-center" id="userDisplay">
+                                <div class="avatar-circle">S</div>
+                                <div class="ms-2">
+                                    <div class="fw-bold">Student</div>
+                                    <div class="small text-muted">Student</div>
+                                </div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="mb-0 student-accent"><i class="bi bi-speedometer2 me-2"></i>Student Dashboard</h2>
+                <p class="text-muted">View and provide feedback for your courses</p>
+                <div id="errorMessage"></div>
+                <div id="successMessage"></div>
+            </div>
+        </div>
+
+        <!-- Welcome Banner -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card bg-primary text-white">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="card-title">Welcome to the Feedback System</h4>
+                                <p class="card-text">Your honest feedback helps improve courses and teaching methods. All feedback is anonymous and confidential.</p>
+                                <p class="mb-0"><i class="bi bi-shield-check me-2"></i>Your identity is protected when submitting feedback.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <img src="https://pixabay.com/get/gd17566de8de801fe0caaa7da1051c9b8a8db4619963b4199e22806db807b7e2abcb9cff2902b0ef858d75c527a69a98c18d19e53b894eefdfadd3755f34f0b42_1280.jpg" alt="Student feedback" class="img-fluid rounded" style="max-height: 120px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Feedback Forms -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Pending Feedback Forms</h5>
+                        <span class="badge bg-primary" id="pendingCount">0</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Instructor</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingFormsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">Loading feedback forms...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Courses -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">My Courses</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="row g-0" id="coursesContainer">
+                            <div class="col-12 text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 mb-0">Loading courses...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Tips -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tips for Providing Effective Feedback</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Be specific about what worked well or needs improvement
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Focus on the course content and teaching methods, not personal matters
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Provide constructive suggestions for improvement
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                        Avoid personal attacks or disrespectful language
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                        Don't focus solely on negative aspects
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-x-circle-fill text-danger me-2"></i>
+                                        Avoid vague comments like "good course" or "bad instructor"
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Details Modal -->
+    <div class="modal fade" id="courseDetailsModal" tabindex="-1" aria-labelledby="courseDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="courseDetailsModalLabel">Course Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6 class="fw-bold" id="modalCourseName"></h6>
+                        <p class="text-muted mb-0" id="modalCourseCode"></p>
+                        <p class="text-muted mb-0">Department: <span id="modalCourseDepartment"></span></p>
+                        <p class="text-muted mb-0">Semester: <span id="modalCourseSemester"></span></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Course Rating</h6>
+                        <div id="modalCourseRating"></div>
+                        <p class="text-muted small mb-0" id="modalCourseFeedbacks"></p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Instructor</h6>
+                        <p class="mb-0" id="modalCourseInstructor"></p>
+                    </div>
+                    
+                    <div>
+                        <h6>Description</h6>
+                        <p class="mb-0" id="modalCourseDescription"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 bg-dark text-white-50 border-top mt-auto">
+        <div class="container text-center">
+            <small>Copyright &copy; 2023 Academic Feedback System. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../api.js"></script>
+    <script src="../script.js"></script>
+    <script src="student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the navbar
+            initNavbar('dashboard');
+            
+            // Initialize the student dashboard
+            initStudentDashboard();
+        });
+    </script>
+</body>
+</html>

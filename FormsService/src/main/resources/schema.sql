@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS feedback_forms (
 	created_by BIGINT NOT NULL,
     deadline DATE,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS feedback_responses (
 	course_rating TINYINT NOT NULL,
 	instructor_rating TINYINT NOT NULL,
 	comment VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_form FOREIGN KEY (form_id) REFERENCES feedback_forms(id) ON DELETE CASCADE,
     CONSTRAINT fk_student_id FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );

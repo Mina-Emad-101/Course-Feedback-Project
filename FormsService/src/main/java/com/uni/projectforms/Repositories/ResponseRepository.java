@@ -24,7 +24,8 @@ public interface ResponseRepository extends CrudRepository<Response, Long> {
 	@Query("""
 			SELECT new com.uni.projectforms.Responses.InstructorRatingsResponse(
 			    AVG(r.instructorRating),
-				COUNT(r.id)
+				COUNT(r.id),
+				r.form.course.instructor
 			)
 			FROM Response r
 			WHERE r.form.course.instructor = :instructor
